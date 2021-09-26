@@ -1,2 +1,3 @@
 # shellhack-minesweeper
-Minesweeper python project for shellbacks 2021
+minesweeper python project for shellhacks 2021
+this code is used with tkinter for its GUI
