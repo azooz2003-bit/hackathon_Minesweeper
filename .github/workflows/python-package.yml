@@ -1,0 +1,223 @@
+import tkinter as tk
+import random 
+import math
+import ctypes
+
+
+# In[66]:
+window = tk.Tk()
+window.title('Minesweeper')
+
+def return_size(entry):
+    global num_rc
+    num_rc = int(enterSize.get())
+    
+    
+    
+    sizePrompt.destroy()
+    enterSize.destroy()
+    bombsReady()
+
+
+# In[67]:
+
+
+def bombsReady():
+    
+    bombsPrompt.grid(row=1, column=0, padx = 30)
+    
+    enterBombs.grid(row=2, column=0, pady = 30)
+
+
+# In[68]:
+
+
+def return_bombs(entry):
+    global num_bombs
+    num_bombs = int(enterBombs.get())
+    enterBombs.destroy()
+    bombsPrompt.destroy()
+    inputsEntered()
+    
+
+
+# In[69]:
+
+
+def inputsEntered():
+
+    window.rowconfigure(list(range(0, num_rc)), minsize = 50, weight = 1)
+    window.columnconfigure(list(range(0, num_rc)), minsize = 50, weight = 1)
+    global cells
+    global numChecked
+    
+    
+    cells = [[''] * num_rc for i in range(num_rc)]
+    
+
+    for row in range(num_rc):
+        for col in range(num_rc):
+            cells[row][col] = tk.Label(window, text='', borderwidth=1, relief="solid")
+            cells[row][col].bind("<Button-1>", cellChecked)
+            cells[row][col].bind("<Button-2>", cellFlagged)
+            cells[row][col].bind("<Button-3>", cellFlagged)
+            cells[row][col].grid(row = row, column = col, sticky="nsew")
+    
+
+    
+    placeBombs()
+
+
+# In[70]:
+
+
+def placeBombs():
+    global bomb_placements
+    
+    global boxes_bombs
+    boxes_bombs = [[0] * num_rc for i in range(num_rc)]
+    bomb_placements = [[0,0] for i in range(num_bombs)]
+    
+    for i in range(num_bombs):
+        bomb_placements[i][0] = math.ceil(random.random() * (num_rc )) -1
+        bomb_placements[i][1] = math.ceil(random.random() * (num_rc )) -1
+        for j in range(i):
+            while(bomb_placements[i][0] == bomb_placements[j][0] and bomb_placements[i][1] == bomb_placements[j][1]):
+                bomb_placements[i][0] = math.ceil(random.random() * (num_rc )) -1
+                bomb_placements[i][1] = math.ceil(random.random() * (num_rc )) -1
+        boxes_bombs[bomb_placements[i][0]][bomb_placements[i][1]] = "bomb"
+    
+    for row in range(num_rc):
+        for col in range(num_rc):
+            if boxes_bombs[row][col] != 'bomb': 
+                if row < (num_rc-1):
+                    if boxes_bombs[row+1][col] == 'bomb':
+                        boxes_bombs[row][col] += 1
+                if col < (num_rc-1):
+                    if boxes_bombs[row][col+1] == 'bomb':
+                        boxes_bombs[row][col] += 1
+                if row != 0:
+                    if boxes_bombs[row-1][col] == 'bomb':
+                        boxes_bombs[row][col] += 1
+                if col != 0:
+                    if boxes_bombs[row][col-1] == 'bomb':
+                        boxes_bombs[row][col] += 1
+                if row != 0 and col != 0:
+                    if boxes_bombs[row-1][col-1] == 'bomb':
+                        boxes_bombs[row][col] += 1
+                if row != 0 and col < (num_rc -1):
+                    if boxes_bombs[row-1][col+1] == 'bomb':
+                        boxes_bombs[row][col] += 1
+                if row < (num_rc-1) and col < (num_rc -1):
+                    if boxes_bombs[row+1][col+1] == 'bomb':
+                        boxes_bombs[row][col] += 1          
+                if row < (num_rc - 1) and col != 0:
+                    if boxes_bombs[row+1][col-1] == 'bomb':
+                        boxes_bombs[row][col] += 1
+    
+    global cells
+    global numChecked
+    numGiven = 0
+    if (num_rc * num_rc) >= 20:
+        for row in range(num_rc):
+            for col in range(num_rc):
+                if boxes_bombs[row][col] != "bomb" and numGiven == 0:
+                    cells[row][col]["text"] = boxes_bombs[row][col]
+                    numGiven += 1
+                    numChecked += 1
+
+
+# In[71]:
+
+
+def cellFlagged(event):
+    global numFlagged
+    
+    col = event.widget.grid_info()['column']
+    row = event.widget.grid_info()['row']
+    if cells[row][col]["bg"] == "red":
+        cells[row][col]["bg"] = "gray95"
+        numFlagged -= 1
+    else:
+        cells[row][col]["bg"] = "red"
+        numFlagged += 1
+    if (numChecked + numFlagged) == (num_rc * num_rc):
+        if numFlagged == num_bombs:
+            window.destroy()
+            
+            
+            
+            ctypes.windll.user32.MessageBoxW(0, "YOU WIN!!", "CONGRATS!!", 1)
+            
+        else:
+            window.destroy()
+            ctypes.windll.user32.MessageBoxW(0, "YOU LOSE!!", "TRY ANOTHER GAME! You're bad.", 1)
+
+# In[72]:
+
+
+def cellChecked(event):
+    global numChecked
+    col = event.widget.grid_info()['column']
+    row = event.widget.grid_info()['row']
+    if cells[row][col]["text"] == '':
+        numChecked += 1
+    cells[row][col]["text"] = boxes_bombs[row][col]
+    if cells[row][col]["text"] == "bomb":
+        window.destroy()
+        
+        ctypes.windll.user32.MessageBoxW(0, "YOU LOSE!!", "TRY ANOTHER GAME! You're bad.", 1)
+    if (numChecked + numFlagged) == (num_rc * num_rc):
+        if numFlagged == num_bombs:
+            window.destroy()
+            
+            
+            ctypes.windll.user32.MessageBoxW(0, "YOU WIN!!", "CONGRATS!!", 1)
+            
+
+            
+            
+
+
+# In[90]:
+
+
+def startPrompts():
+    
+    sizePrompt.grid(row=1, column=0)
+    enterSize.grid(row=2, column=0)
+
+
+# In[95]:
+
+
+
+global numChecked
+global numFlagged 
+numChecked = 0
+numFlagged = 0
+
+fontstyles = ("Comic Sans MS", 20, "bold")
+
+
+sizePrompt = tk.Label(window, text = "Enter the rows/columns for Minesweeper")
+sizePrompt.configure(font = fontstyles)
+sizePrompt.grid(padx = 30)
+enterSize = tk.Entry(window)
+enterSize.configure(font = fontstyles)
+enterSize.grid(pady = 30)
+
+enterSize.bind('<Return>', return_size)
+startPrompts()
+bombsPrompt = tk.Label(window, text = "Enter the number of bombs.")
+bombsPrompt.configure(font = fontstyles)
+enterBombs = tk.Entry(window)
+enterBombs.configure(font = fontstyles)
+enterBombs.bind('<Return>', return_bombs)
+
+
+
+window.mainloop()
+
+
+# In[ ]:
