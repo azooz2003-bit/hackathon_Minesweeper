@@ -218,6 +218,3 @@ enterBombs.bind('<Return>', return_bombs)
 
 
 window.mainloop()
-
-
-# In[ ]:
