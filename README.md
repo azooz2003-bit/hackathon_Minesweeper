@@ -1,3 +1,2 @@
-# shellhack-minesweeper
-minesweeper Python project for Shellhacks 2021
-this code uses Tkinter for its GUI
+This is a minesweeper game me and my team made in the Shellhacks hackathon. We used Python and Tkinter to design the GUI.
+
