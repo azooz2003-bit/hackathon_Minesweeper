@@ -1,3 +1,7 @@
-Minesweeper
-This is a minesweeper game me and my team made in the Shellhacks hackathon. We used Python and Tkinter to design the GUI.
+# Minesweeper
 
+This is a Minesweeper game developed for ShellHacks 2022.
+
+# Techologies
+
+Python, Tkinter.
